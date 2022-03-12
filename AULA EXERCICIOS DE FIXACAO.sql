@@ -1,3 +1,38 @@
+-----Manipulando Datas
+---Pegando a data atual: Para pegar a data atual usamos a função current_date.
+SELECT date_part('day', current_date);
+SELECT date_part('month', current_date);
+SELECT date_part('year', current_date);
+
+---Exemplo: Mostrando os meses das vendas
+SELECT order_id, date_part('month', required_date) FROM orders
+
+----Exemplo: Verificando a média do frete
+SELECT 
+    DATE_PART('month', required_date), 
+	orders.order_id,
+    AVG(freight) 
+FROM orders
+GROUP BY DATE_PART('month', required_date), orders.order_id 
+ORDER BY 1;
+
+SELECT CURRENT_DATE;
+SELECT CURRENT_TIME;
+SELECT CURRENT_TIME(0);
+
+--Obtendo o dia do mês:
+SELECT DATE_PART('DAY', CURRENT_DATE) AS Dia;
+
+--Somar dias e horas a uma data:
+SELECT CAST(CURRENT_DATE AS DATE) + INTERVAL '27 DAYS' AS Data;
+
+SELECT TO_DATE('2022-03-05', 'YYYY-MM-DD')
+SELECT TO_DATE('20220305', 'YYYYMMDD')
+--Função timeofday (retorna texto)
+select TIMEOFDAY();
+
+A função CAST() é utilizada para converter explicitamente tipos de dados em outros.
+
 ----
 CREATE DATABASE empresa;
 
@@ -173,3 +208,59 @@ departamento cujo gerente é o empregado de nome ‘Frank T. Santos’.
 10. Selecione o nome dos empregados que trabalham em todos os projetos controlados pelo
 departamento cujo gerente é o empregado de nome ‘Frank T. Santos’.
 
+select NomeFunc, salario from funcionario where salario <> 1000;
+
+SELECT NomeFunc, Endereco FROM funcionario WHERE NomeFunc = 'Luciana S. Santos';
+
+SELECT NomeFunc, Salario 
+FROM funcionario 
+WHERE DataNasc BETWEEN '1961/01/01' AND '1970/12/31'
+AND Sexo = 'F' AND Salario < 1000;
+
+SELECT NomeFunc 
+FROM funcionario F 
+WHERE EXISTS 
+(SELECT * FROM dependente D WHERE F.ID_Func = D.ID_Func);
+
+SELECT DISTINCT NomeFunc 
+FROM funcionario F, dependente D 
+where F.ID_Func = D.ID_Func;
+
+SELECT ID_Func, NomeFunc, ID_Superv 
+FROM funcionario where ID_Superv IS NOT NULL;
+
+SELECT ID_Func, NomeFunc, ID_Superv 
+FROM funcionario where ID_Superv != 1;
+
+SELECT ID_Func, NomeFunc, ID_Superv 
+FROM funcionario where ID_Superv != 1 OR ID_Superv IS NULL;
+
+SELECT NomeFunc, NomeDep 
+FROM funcionario F, dependente D where F.ID_Func = D.ID_Func;
+SELECT NomeFunc, NomeDep FROM funcionario F JOIN dependente D ON F.ID_Func = D.ID_Func;
+SELECT NomeFunc, NomeDep FROM funcionario F LEFT OUTER JOIN dependente D ON F.ID_Func = D.ID_Func;
+
+SELECT NomeFunc, COUNT(*) as NumFunc, 
+MIN(salario) as MenorSalario, 
+MAX(salario) as MaiorSalario, 
+SUM(salario) as SomaSalarios, 
+AVG(salario) as MediaSalario 
+from funcionario;
+
+SELECT ID_Depto, COUNT(*) as NumFunc, MIN(salario) as MenorSalario, MAX(salario) as MaiorSalario, SUM(salario) as SomaSalarios, AVG(salario) as MediaSalario 
+from funcionario GROUP BY ID_Depto;
+
+SELECT ID_Depto, COUNT(*) as NumFunc, MIN(salario) as MenorSalario, MAX(salario) as MaiorSalario, SUM(salario) as SomaSalarios, AVG(salario) as MediaSalario 
+from funcionario GROUP BY ID_Depto HAVING COUNT(*) > 2;
+
+SELECT COUNT(*) as NumFunc, COUNT(salario), COUNT(ID_Superv) from funcionario;
+
+SELECT ID_Depto, NomeDepto, COUNT(*) FROM funcionario NATURAL JOIN departamento GROUP BY ID_Depto, NomeDepto;
+
+SELECT * FROM funcionario ORDER BY salario DESC, NomeFunc ASC;
+
+update funcionario
+set Endereco = 'R. Bahia, 200', salario = 2200;
+
+create view FuncReduzido as select ID_Func, NomeFunc, Endereco from Funcionario;
+select * from funcreduzido;
